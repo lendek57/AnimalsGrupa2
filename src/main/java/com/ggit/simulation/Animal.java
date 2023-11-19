@@ -12,7 +12,17 @@ public class Animal {
     }
 
     public void move(MapDirection direction) {
-        position = position.add(direction.getUnitVector());
+        position = pbc(position.add(direction.getUnitVector()));
         System.out.println("Zwierzę przesunęło się na pozycję: " + position);
+    }
+
+    private Vector2D pbc(Vector2D position) {
+        int width = Simulation.getWidth();
+        int height = Simulation.getHeight();
+        if (position.getY() >= height) return position.subtrack(new Vector2D(0, height));
+        if (position.getY() < 0) return position.add(new Vector2D(0, height));
+        if (position.getX() >= width) return position.subtrack(new Vector2D(width, 0));
+        if (position.getX() < 0) return position.add(new Vector2D(width, 0));
+        return position;
     }
 }

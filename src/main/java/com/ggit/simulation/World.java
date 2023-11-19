@@ -1,15 +1,11 @@
 package com.ggit.simulation;
 
-import java.util.Random;
-
 public class World {
+    private static final int defaultNoOfDays = 10;
     public static void main(String[] args) {
-        Random random = new Random();
-        Animal animal = new Animal(new Vector2D(random.nextInt(100), random.nextInt(100)));
-        System.out.println("Zwierzę znajduje się na pozycji: " + animal.getPosition());
-
-        for (MapDirection direction : MapDirection.values()) {
-            animal.move(direction);
+        int noOfDays = args.length > 0 ? Integer.parseInt(args[0]) : defaultNoOfDays;
+        for (int i = 0; i < noOfDays; i++) {
+            Simulation.simulateDay();
         }
     }
 }
