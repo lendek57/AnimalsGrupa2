@@ -18,6 +18,8 @@ public class Simulation {
     }
 
     public static void simulateDay() {
+        System.out.println("Nowy dzień!");
         worldMap.run();
+        worldMap.eat();
     }
 }
