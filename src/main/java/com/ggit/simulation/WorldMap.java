@@ -41,13 +41,13 @@ public class WorldMap extends AbstractWorldMap {
 
     @Override
     public void eat() {
-        for (Animal animal : animals.list) {
+        animals.list.forEach(animal -> {
             if (isOccupiedByPlant(animal.getPosition())) {
                 System.out.println("Zwierzę " + animal.getId() + " zjadło roślinę");
                 plants.remove(animal.getPosition());
                 addPlant();
             }
-        }
+        });
     }
 
     private class AnimalsMapping {
@@ -56,8 +56,8 @@ public class WorldMap extends AbstractWorldMap {
 
         AnimalsMapping() {
             mapping = new HashMap<>();
-            for (int i = 0; i < noOfAnimals; i++) addAnimal();
             list = new LinkedList<>();
+            for (int i = 0; i < noOfAnimals; i++) addAnimal();
         }
 
         void addAnimal() {
@@ -67,18 +67,16 @@ public class WorldMap extends AbstractWorldMap {
         }
 
         void placeAnimalOnMap(Animal animal) {
-            List<Animal> animalsOnPosition = mapping.get(animal.getPosition());
-            if (animalsOnPosition == null) mapping.put(animal.getPosition(), new LinkedList<>(List.of(animal)));
-            else animalsOnPosition.add(animal);
+            mapping.computeIfAbsent(animal.getPosition(), pos -> new LinkedList<>()).add(animal);
         }
 
         void moveAnimals() {
             mapping.clear();
             MapDirection[] directions = MapDirection.values();
-            for (Animal animal : list) {
+            list.forEach(animal -> {
                 animal.move(directions[random.nextInt(directions.length)]);
                 placeAnimalOnMap(animal);
-            }
+            });
         }
     }
 }
