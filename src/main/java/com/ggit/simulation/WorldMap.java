@@ -45,9 +45,8 @@ public class WorldMap extends AbstractWorldMap {
 
     @Override
     public void run() {
-        MapDirection[] directions = MapDirection.values();
         animals.list.forEach(animal -> {
-            animal.move(directions[random.nextInt(directions.length)]);
+            animal.move(MapDirection.getRandomDirection());
             animals.placeAnimalOnMap(animal);
         });
     }

@@ -2,15 +2,30 @@ package com.ggit.simulation;
 
 public class Animal implements Comparable<Animal> {
     private Vector2D position;
-    private int id;
+    private final int id;
     private int energy;
     private int age = 1;
+    private final Genome genome;
+    private int numberOfChildren = 0;
     private static int counter = 0;
 
     public Animal(Vector2D position, int initialEnergy) {
         this.position = position;
         id = counter++;
         energy = initialEnergy;
+        genome = new Genome();
+    }
+
+    public Genome getGenome() {
+        return genome;
+    }
+
+    public int getNumberOfChildren() {
+        return numberOfChildren;
+    }
+
+    public void increaseNumberOfChildren() {
+        numberOfChildren++;
     }
 
     public int getEnergy() {

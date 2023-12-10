@@ -1,5 +1,7 @@
 package com.ggit.simulation;
 
+import java.util.Random;
+
 public enum MapDirection {
     NORTH(0, 1), SOUTH(0, -1), EAST(1, 0), WEST(-1, 0);
 
@@ -11,5 +13,10 @@ public enum MapDirection {
 
     public Vector2D getUnitVector() {
         return unitVector;
+    }
+
+    public static MapDirection getRandomDirection() {
+        MapDirection[] directions = MapDirection.values();
+        return directions[(new Random()).nextInt(directions.length)];
     }
 }
