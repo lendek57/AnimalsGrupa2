@@ -5,4 +5,6 @@ public interface IWorldMap {
     int getWidth();
     void run();
     void eat();
+    void startDay();
+    void endDay();
 }
