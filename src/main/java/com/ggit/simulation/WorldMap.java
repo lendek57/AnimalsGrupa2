@@ -1,6 +1,7 @@
 package com.ggit.simulation;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class WorldMap extends AbstractWorldMap {
     private Map<Vector2D, Plant> plants;
@@ -45,8 +46,9 @@ public class WorldMap extends AbstractWorldMap {
 
     @Override
     public void run() {
+        animals.mapping.clear();
         animals.list.forEach(animal -> {
-            animal.move(MapDirection.getRandomDirection());
+            animal.moveBasedOnGenome();
             animals.placeAnimalOnMap(animal);
         });
     }
@@ -66,6 +68,25 @@ public class WorldMap extends AbstractWorldMap {
     }
 
     @Override
+    public void reproduce() {
+        List<Animal> children = new LinkedList<>();
+        animals.mapping.forEach((position, animalsList) -> {
+            List<Animal> parents = animalsList.stream()
+                    .filter(animal -> animal.getEnergy() > animalEnergy / 2)
+                    .sorted(Comparator.reverseOrder())
+                    .limit(2)
+                    .toList();
+            if (parents.size() == 2) {
+                Animal child = new Animal(parents.get(0), parents.get(1));
+                System.out.printf("Urodziło się nowe zwierzę %d. Rodzice to %d i %d",
+                        child.getId(), parents.get(0).getId(), parents.get(1).getId());
+                children.add(child);
+            }
+        });
+        children.forEach(animal -> animals.addAnimal(animal));
+    }
+
+    @Override
     public void endDay() {
         dayNumber++;
         int animalsCount = animals.list.size();
@@ -74,9 +95,32 @@ public class WorldMap extends AbstractWorldMap {
                         .map(animal -> animal.withChangedEnergy(animal.getEnergy() - dayEnergy))
                         .filter(animal -> animal.getEnergy() >= 0)
                         .map(Animal::dayOlder)
-                        .toList()
+                        .collect(Collectors.toList())
         );
         System.out.printf("Zwierząt było %d, pozostało %d\n", animalsCount, animals.list.size());
+    }
+
+    @Override
+    public SimulationStatistics getStatistics() {
+        int animalsCount = animals.list.size();
+        if (animalsCount == 0) return new SimulationStatistics(dayNumber, 0, 0, 0, 0);
+        return new SimulationStatistics(
+                dayNumber,
+                animals.list.stream().mapToInt(Animal::getAge).sum() / animalsCount,
+                animals.list.stream().mapToInt(Animal::getEnergy).sum() / animalsCount,
+                animals.list.stream().mapToInt(Animal::getNumberOfChildren).sum() / animalsCount,
+                animalsCount
+        );
+    }
+
+    @Override
+    public Map<Vector2D, List<Animal>> getAnimals() {
+        return animals.mapping;
+    }
+
+    @Override
+    public Set<Vector2D> getPlantsLocations() {
+        return plants.keySet();
     }
 
     private class AnimalsMapping {
@@ -86,11 +130,12 @@ public class WorldMap extends AbstractWorldMap {
         AnimalsMapping() {
             mapping = new HashMap<>();
             list = new LinkedList<>();
-            for (int i = 0; i < noOfAnimals; i++) addAnimal();
+            for (int i = 0; i < noOfAnimals; i++) {
+                addAnimal(new Animal(getRandomPosition(), animalEnergy));
+            }
         }
 
-        void addAnimal() {
-            Animal animal = new Animal(getRandomPosition(), animalEnergy);
+        void addAnimal(Animal animal) {
             placeAnimalOnMap(animal);
             list.add(animal);
         }
@@ -101,7 +146,6 @@ public class WorldMap extends AbstractWorldMap {
 
         void updateAnimals(List<Animal> newAnimals) {
             list = newAnimals;
-            mapping.clear();
         }
     }
 }
